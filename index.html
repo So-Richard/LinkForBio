@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KINGADS - Link in Bio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #fdf2f8; /* พื้นหลังสีชมพูพาสเทล (Pink-50) */
+        }
+        
+        /* ซ่อน Scrollbar แต่ยังเลื่อนได้ */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* แอนิเมชันสำหรับเปลี่ยนรูปและชื่อ */
+        .fade-transition {
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 pb-12">
+
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden">
+        
+        <div class="h-48 w-full bg-pink-100 relative">
+            <img id="banner-img" src="https://img5.pic.in.th/file/secure-sv1/kingads3bdc31b8ed44210e.png" alt="Banner" class="w-full h-full object-cover fade-transition">
+        </div>
+
+        <div class="relative -mt-16 text-center px-4">
+            <img id="profile-img" src="https://img2.pic.in.th/Kingadsc508ea3307fbe262.png" alt="Profile" class="w-32 h-32 rounded-full mx-auto border-4 border-white shadow-lg object-cover bg-white fade-transition">
+            
+            <h1 id="name-text" class="mt-4 text-2xl font-bold text-pink-600 fade-transition">KINGADS</h1>
+            <p class="text-sm text-gray-500 mt-1"><i class="fa-solid fa-heart text-pink-400"></i> Welcome to our services <i class="fa-solid fa-heart text-pink-400"></i></p>
+        </div>
+
+        <div class="px-6 mt-8 space-y-4">
+            
+            <button onclick="trackAndGo('KINGADS (Line)', 'https://lin.ee/bl3UCmI')" class="w-full bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-700 font-medium py-3 px-6 rounded-full shadow-sm transition-transform transform hover:scale-105 flex items-center justify-between">
+                <span class="flex items-center gap-3">
+                    <i class="fa-brands fa-line text-xl text-green-500"></i>
+                    KINGADS
+                </span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+            </button>
+
+            <button onclick="trackAndGo('Premium App (Line)', 'https://lin.ee/vOnHdOS')" class="w-full bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-700 font-medium py-3 px-6 rounded-full shadow-sm transition-transform transform hover:scale-105 flex items-center justify-between">
+                <span class="flex items-center gap-3">
+                    <i class="fa-solid fa-store text-xl text-pink-400"></i>
+                    Premium App
+                </span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+            </button>
+
+            <button onclick="trackAndGo('ตัวอย่างแอคเคาท์', 'https://king-ads.github.io/ex.acc/')" class="w-full bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-medium py-3 px-6 rounded-full shadow-sm transition-transform transform hover:scale-105 flex items-center justify-between">
+                <span class="flex items-center gap-3">
+                    <i class="fa-solid fa-images text-xl text-purple-400"></i>
+                    ตัวอย่างแอคเคาท์
+                </span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+            </button>
+
+            <button onclick="trackAndGo('เว็บเพิ่มไลค์ 24h', 'https://king-ads.github.io/KINGADS/')" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-medium py-3 px-6 rounded-full shadow-sm transition-transform transform hover:scale-105 flex items-center justify-between text-left">
+                <span class="flex items-center gap-3">
+                    <i class="fa-solid fa-thumbs-up text-xl text-rose-400"></i>
+                    <span class="text-sm sm:text-base">เว็บเพิ่มไลค์ วิว ผู้ติดตาม 24 ชั่วโมง</span>
+                </span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+            </button>
+
+            <button onclick="trackAndGo('Promotion', 'https://king-ads.github.io/Promotion/')" class="w-full bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-medium py-3 px-6 rounded-full shadow-sm transition-transform transform hover:scale-105 flex items-center justify-between">
+                <span class="flex items-center gap-3">
+                    <i class="fa-solid fa-bullhorn text-xl text-rose-400"></i>
+                    โปรโมชัน
+                </span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+            </button>
+
+            <button onclick="trackAndGo('ช่องทางการโอนเงิน', 'https://img5.pic.in.th/file/secure-sv1/-629_20260222132327.png')" class="w-full bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 font-medium py-3 px-6 rounded-full shadow-sm transition-transform transform hover:scale-105 flex items-center justify-between">
+                <span class="flex items-center gap-3">
+                    <i class="fa-solid fa-money-bill-transfer text-xl text-green-500"></i>
+                    ช่องทางการโอนเงิน
+                </span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-40"></i>
+            </button>
+
+        </div>
+
+        <div class="mt-8 flex justify-center space-x-6">
+            <a href="javascript:void(0)" onclick="trackAndGo('Facebook Contact', 'https://www.facebook.com/share/17B9kizo7g/?mibextid=wwXIfr')" class="text-blue-600 hover:text-blue-700 text-4xl transition-transform hover:scale-110">
+                <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="javascript:void(0)" onclick="trackAndGo('Gmail Contact', 'mailto:Kingadswolkker@gmail.com')" class="text-red-500 hover:text-red-600 text-4xl transition-transform hover:scale-110">
+                <i class="fa-solid fa-envelope"></i>
+            </a>
+        </div>
+
+        <div class="mt-8 px-4 flex justify-center w-full overflow-hidden rounded-lg">
+            <iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fweb.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid02H2me4yYrcfZCpYmTdsxdNrzTbht3qWECJLsavGvobWzLbXfcgWUZaAeqSee346gKl%26id%3D61555794654892&show_text=true&width=500" width="100%" height="250" style="border:none;overflow:hidden; max-width:500px;" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+        </div>
+
+        <footer class="text-center text-xs text-gray-400 mt-10 pb-4">
+            <p>Powered by GitHub Pages</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- 1. URL ของ Google Apps Script ที่คุณให้มา ---
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwrgnIITUoqJab8dquWT7fd8q9pB6u6MHfbXPgTATlLHAsaanWfrkcDOvCQm3ggIY80/exec";
+
+        // --- 2. ข้อมูลรูปภาพและชื่อสำหรับสลับ ---
+        const profiles = [
+            "https://img2.pic.in.th/Kingadsc508ea3307fbe262.png",
+            "https://img2.pic.in.th/Minako-TH.png"
+        ];
+        const names = ["KINGADS", "So Richard"];
+        const banners = [
+            "https://img5.pic.in.th/file/secure-sv1/kingads3bdc31b8ed44210e.png",
+            "https://img5.pic.in.th/file/secure-sv1/0b9f6485e2eef7fc70e64992e50e78d4.png"
+        ];
+
+        // --- 3. ระบบสลับภาพและชื่ออัตโนมัติ (ทุก 5 วินาที) ---
+        let currentIndex = 0;
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % profiles.length;
+            
+            const profileEl = document.getElementById('profile-img');
+            const nameEl = document.getElementById('name-text');
+            const bannerEl = document.getElementById('banner-img');
+
+            // ลด Opacity เพื่อทำ Effect Fade out
+            profileEl.style.opacity = 0;
+            nameEl.style.opacity = 0;
+            bannerEl.style.opacity = 0;
+
+            // รอให้ Fade out เสร็จ (0.5 วิ) แล้วค่อยเปลี่ยนข้อมูล
+            setTimeout(() => {
+                profileEl.src = profiles[currentIndex];
+                nameEl.innerText = names[currentIndex];
+                bannerEl.src = banners[currentIndex];
+                
+                // คืนค่า Opacity เพื่อทำ Effect Fade in
+                profileEl.style.opacity = 1;
+                nameEl.style.opacity = 1;
+                bannerEl.style.opacity = 1;
+            }, 500);
+        }, 5000);
+
+        // --- 4. ฟังก์ชันบันทึกข้อมูลและเปิดลิงก์ ---
+        function trackAndGo(linkName, targetUrl) {
+            // เปิดลิงก์เป้าหมายทันที เพื่อให้ผู้ใช้ไม่ต้องรอ
+            if (targetUrl.startsWith('mailto:')) {
+                window.location.href = targetUrl;
+            } else {
+                window.open(targetUrl, '_blank');
+            }
+
+            // ส่งข้อมูลไปยัง Google Apps Script เบื้องหลัง
+            fetch(GAS_API_URL, {
+                method: "POST",
+                mode: "no-cors", // ใช้ no-cors ป้องกันบล็อกการส่งข้อมูลข้ามโดเมน
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    linkName: linkName,
+                    device: navigator.userAgent
+                })
+            }).catch(error => {
+                console.error("Tracking Error:", error);
+            });
+        }
+    </script>
+</body>
+</html>
