@@ -26,7 +26,7 @@
         <img src="https://img1.pic.in.th/images/quality_restoration_2569031620351005609152d8c8d13a154.png" alt="Profile" class="relative w-32 h-32 rounded-full shadow-xl border-4 border-white mb-4 object-cover z-10">
       </div>
       <h1 class="text-3xl font-bold text-pink-600 tracking-wide mt-2">So Richard</h1>
-      <p class="text-pink-500 mt-1 text-md font-medium bg-pink-50 px-4 py-1 rounded-full border border-pink-100">บริการแอพพรีเมียมและเพิ่มยอดโซเชียลครบวงจร</p>
+      <p class="text-pink-500 mt-1 text-md font-medium bg-pink-50 px-4 py-1 rounded-full border border-pink-100">บริการเพิ่มยอดโซเชียลครบวงจร</p>
     </div>
 
     <div class="flex flex-col gap-4">
@@ -91,7 +91,8 @@
         </div>
         <img src="https://img2.pic.in.th/line_oa_chat_260317_114910861776dae4352024.jpeg" alt="QR Code" class="w-full max-w-[200px] rounded-2xl shadow-sm mb-4 border-4 border-pink-50">
         <p class="text-pink-500 font-semibold text-center text-sm mb-6 bg-pink-50 px-4 py-2 rounded-full">กรุณาส่งสลิปในไลน์ร้านนะคะ</p>
-        <button onclick="closeModal('transfer-modal')" class="btn-cute w-full bg-gray-100 text-gray-500 font-bold py-3 rounded-full">ปิดหน้าต่าง</button>
+        
+        <button onclick="generateAndDownloadSlip()" class="btn-cute w-full bg-pink-100 hover:bg-pink-200 text-pink-600 font-bold py-3 rounded-full transition-colors">ปิดหน้าต่าง (รับสลิป)</button>
       </div>
     </div>
   </div>
@@ -218,6 +219,134 @@
       logClick('ยืนยันจำนวนเงินโอน', `ยอดเงิน: ${amount} บาท`);
     }
 
+    // ฟังก์ชันสร้างและดาวน์โหลดสลิป
+    function generateAndDownloadSlip() {
+      const amountStr = document.getElementById('transfer-amount').value;
+      const amount = parseFloat(amountStr);
+      if (!amount || amount <= 0) {
+        closeModal('transfer-modal');
+        return;
+      }
+
+      // สร้าง Canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 800;
+      const ctx = canvas.getContext('2d');
+
+      // วาดพื้นหลัง
+      ctx.fillStyle = '#fdf2f8';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // วาดกรอบ
+      ctx.strokeStyle = '#fbcfe8';
+      ctx.lineWidth = 15;
+      ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
+
+      const drawContent = (logoImg) => {
+        // โลโก้
+        if (logoImg) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, 160, 80, 0, Math.PI * 2, true);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(logoImg, canvas.width / 2 - 80, 80, 160, 160);
+          ctx.restore();
+          
+          ctx.strokeStyle = '#fbcfe8';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, 160, 80, 0, Math.PI * 2, true);
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = '#db2777';
+        ctx.font = 'bold 40px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ใบเสร็จรับเงิน', canvas.width / 2, 300);
+
+        ctx.fillStyle = '#ec4899';
+        ctx.font = '24px sans-serif';
+        ctx.fillText('So Richard - บริการเพิ่มยอดโซเชียล', canvas.width / 2, 340);
+
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        ctx.moveTo(60, 390);
+        ctx.lineTo(canvas.width - 60, 390);
+        ctx.strokeStyle = '#f9a8d4';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#4b5563';
+        ctx.font = '26px sans-serif';
+        
+        const dateObj = new Date();
+        const dateStr = dateObj.toLocaleDateString('th-TH') + ' ' + dateObj.toLocaleTimeString('th-TH');
+        
+        let startY = 450;
+        ctx.fillText('วันที่:', 60, startY);
+        ctx.textAlign = 'right';
+        ctx.fillText(dateStr, canvas.width - 60, startY);
+
+        startY += 60;
+        ctx.textAlign = 'left';
+        ctx.fillText('ยอดเงินที่โอน:', 60, startY);
+        ctx.textAlign = 'right';
+        ctx.fillText(amount.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 60, startY);
+
+        const vat = amount * 0.07;
+        startY += 60;
+        ctx.textAlign = 'left';
+        ctx.fillText('VAT (7%):', 60, startY);
+        ctx.textAlign = 'right';
+        ctx.fillText(vat.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 60, startY);
+
+        startY += 50;
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        ctx.moveTo(60, startY);
+        ctx.lineTo(canvas.width - 60, startY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const total = amount + vat;
+        startY += 70;
+        ctx.fillStyle = '#be185d';
+        ctx.font = 'bold 32px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('ยอดรวมทั้งสิ้น:', 60, startY);
+        ctx.textAlign = 'right';
+        ctx.fillText(total.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 60, startY);
+
+        ctx.fillStyle = '#f472b6';
+        ctx.font = 'bold 26px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ขอบคุณที่ไว้วางใจใช้บริการนะคะ', canvas.width / 2, canvas.height - 80);
+
+        try {
+          const link = document.createElement('a');
+          link.download = 'SoRichard_Receipt.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        } catch(e) {
+          console.error("Canvas Export Error", e);
+        }
+
+        // โหลดเสร็จแล้วค่อยปิดหน้าต่าง
+        closeModal('transfer-modal');
+      };
+
+      const logo = new Image();
+      logo.crossOrigin = "Anonymous";
+      logo.src = 'https://img1.pic.in.th/images/quality_restoration_2569031620351005609152d8c8d13a154.png';
+      
+      logo.onload = () => { drawContent(logo); };
+      logo.onerror = () => { drawContent(null); }; // กรณีติดปัญหาดึงรูปก็จะข้ามไปวาดส่วนอื่นแทน
+    }
+
     function setRating(rating) {
       currentRating = rating;
       const stars = document.querySelectorAll('.star-icon');
@@ -288,7 +417,7 @@
 
       const reviewData = `คะแนน: ${currentRating} ดาว | ข้อความ: ${text}`;
       logClick('ส่งรีวิวร้าน', reviewData).then(() => {
-        alert('ส่งรีวิวเรียบร้อย ขอบคุณมากๆ ค่า!');
+        alert('ส่งรีวิวเรียบร้อย ขอบคุณมากๆ ค่า! 💖');
         closeModal('rating-modal');
         document.getElementById('review-text').value = '';
         setRating(5);
