@@ -26,7 +26,7 @@
         <img src="https://img1.pic.in.th/images/quality_restoration_2569031620351005609152d8c8d13a154.png" alt="Profile" class="relative w-32 h-32 rounded-full shadow-xl border-4 border-white mb-4 object-cover z-10">
       </div>
       <h1 class="text-3xl font-bold text-pink-600 tracking-wide mt-2">So Richard</h1>
-      <p class="text-pink-500 mt-1 text-md font-medium bg-pink-50 px-4 py-1 rounded-full border border-pink-100">บริการเพิ่มยอดโซเชียลครบวงจร</p>
+      <p class="text-pink-500 mt-1 text-md font-medium bg-pink-50 px-4 py-1 rounded-full border border-pink-100">บริการแอพพรีเมียมและเพิ่มยอดโซเชียลครบวงจร</p>
     </div>
 
     <div class="flex flex-col gap-4">
@@ -92,7 +92,23 @@
         <img src="https://img2.pic.in.th/line_oa_chat_260317_114910861776dae4352024.jpeg" alt="QR Code" class="w-full max-w-[200px] rounded-2xl shadow-sm mb-4 border-4 border-pink-50">
         <p class="text-pink-500 font-semibold text-center text-sm mb-6 bg-pink-50 px-4 py-2 rounded-full">กรุณาส่งสลิปในไลน์ร้านนะคะ</p>
         
-        <button onclick="generateAndDownloadSlip()" class="btn-cute w-full bg-pink-100 hover:bg-pink-200 text-pink-600 font-bold py-3 rounded-full transition-colors">ปิดหน้าต่าง (รับสลิป)</button>
+        <button id="btn-create-slip" onclick="generateAndShowSlip()" class="btn-cute w-full bg-pink-100 hover:bg-pink-200 text-pink-600 font-bold py-3 rounded-full transition-colors">สร้างสลิปใบเสร็จรับเงิน</button>
+        <button onclick="closeModal('transfer-modal')" class="w-full text-gray-400 text-sm mt-3 font-semibold hover:text-gray-600">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="slip-modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50 px-4">
+    <div class="absolute w-full h-full bg-pink-900 bg-opacity-60 backdrop-blur-sm" onclick="closeModal('slip-modal')"></div>
+    <div class="modal-content w-full max-w-sm mx-auto z-50 relative flex flex-col items-center">
+      <img id="slip-preview" src="" alt="Slip Preview" class="w-full rounded-[2rem] shadow-2xl border-4 border-white mb-6">
+      
+      <div class="flex gap-4 w-full">
+        <button onclick="closeModal('slip-modal')" class="btn-cute flex-1 bg-white text-pink-500 font-bold py-4 rounded-full shadow-lg">ปิด</button>
+        <button onclick="downloadSlip()" class="btn-cute flex-1 bg-pink-500 text-white font-bold py-4 rounded-full shadow-lg flex justify-center items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          ดาวน์โหลด
+        </button>
       </div>
     </div>
   </div>
@@ -180,6 +196,7 @@
 
     const deviceInfo = navigator.userAgent;
     let currentRating = 5;
+    let currentSlipDataUrl = ''; // เก็บข้อมูลรูปภาพสลิปที่ Gen ไว้
 
     function openModal(id) {
       const el = document.getElementById(id);
@@ -219,132 +236,190 @@
       logClick('ยืนยันจำนวนเงินโอน', `ยอดเงิน: ${amount} บาท`);
     }
 
-    // ฟังก์ชันสร้างและดาวน์โหลดสลิป
-    function generateAndDownloadSlip() {
+    // ฟังก์ชันวาดกรอบขอบมนลงใน Canvas
+    function roundedRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // ฟังก์ชันสร้างสลิปเป็น Canvas และแสดง Preview
+    function generateAndShowSlip() {
       const amountStr = document.getElementById('transfer-amount').value;
       const amount = parseFloat(amountStr);
       if (!amount || amount <= 0) {
-        closeModal('transfer-modal');
         return;
       }
 
-      // สร้าง Canvas
+      const btn = document.getElementById('btn-create-slip');
+      const originalText = btn.innerText;
+      btn.innerText = "กำลังสร้างสลิป...";
+      btn.disabled = true;
+
+      // สร้าง Canvas ความละเอียดสูง (1080 x 1600)
       const canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 800;
+      canvas.width = 1080;
+      canvas.height = 1600;
       const ctx = canvas.getContext('2d');
 
-      // วาดพื้นหลัง
-      ctx.fillStyle = '#fdf2f8';
+      // พื้นหลังสีชมพูพาสเทล
+      ctx.fillStyle = '#fce7f3'; // pink-100
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // วาดกรอบ
-      ctx.strokeStyle = '#fbcfe8';
-      ctx.lineWidth = 15;
-      ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
+      // วาดการ์ดสีขาวขอบมน (เหมือนใบสลิปจริง)
+      ctx.fillStyle = '#ffffff';
+      roundedRect(ctx, 60, 60, 960, 1480, 50);
 
       const drawContent = (logoImg) => {
-        // โลโก้
+        // วาดโลโก้
         if (logoImg) {
           ctx.save();
           ctx.beginPath();
-          ctx.arc(canvas.width / 2, 160, 80, 0, Math.PI * 2, true);
+          ctx.arc(canvas.width / 2, 220, 110, 0, Math.PI * 2, true);
           ctx.closePath();
           ctx.clip();
-          ctx.drawImage(logoImg, canvas.width / 2 - 80, 80, 160, 160);
+          ctx.drawImage(logoImg, canvas.width / 2 - 110, 110, 220, 220);
           ctx.restore();
           
-          ctx.strokeStyle = '#fbcfe8';
-          ctx.lineWidth = 4;
+          ctx.strokeStyle = '#fbcfe8'; // pink-200
+          ctx.lineWidth = 6;
           ctx.beginPath();
-          ctx.arc(canvas.width / 2, 160, 80, 0, Math.PI * 2, true);
+          ctx.arc(canvas.width / 2, 220, 110, 0, Math.PI * 2, true);
           ctx.stroke();
         }
 
-        ctx.fillStyle = '#db2777';
-        ctx.font = 'bold 40px sans-serif';
+        // หัวข้อสลิป
+        ctx.fillStyle = '#be185d'; // pink-700
+        ctx.font = 'bold 50px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('ใบเสร็จรับเงิน', canvas.width / 2, 300);
+        ctx.fillText('e-Slip ใบเสร็จรับเงิน', canvas.width / 2, 410);
 
-        ctx.fillStyle = '#ec4899';
-        ctx.font = '24px sans-serif';
-        ctx.fillText('So Richard - บริการเพิ่มยอดโซเชียล', canvas.width / 2, 340);
+        ctx.fillStyle = '#db2777'; // pink-600
+        ctx.font = '38px sans-serif';
+        ctx.fillText('So Richard', canvas.width / 2, 470);
 
-        ctx.setLineDash([8, 8]);
+        // เส้นประ 1
+        ctx.setLineDash([12, 12]);
         ctx.beginPath();
-        ctx.moveTo(60, 390);
-        ctx.lineTo(canvas.width - 60, 390);
-        ctx.strokeStyle = '#f9a8d4';
-        ctx.lineWidth = 2;
+        ctx.moveTo(120, 540);
+        ctx.lineTo(canvas.width - 120, 540);
+        ctx.strokeStyle = '#fbcfe8';
+        ctx.lineWidth = 3;
         ctx.stroke();
         ctx.setLineDash([]);
 
+        // ข้อมูลวันที่ และ รหัสอ้างอิง
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#4b5563';
-        ctx.font = '26px sans-serif';
+        ctx.fillStyle = '#4b5563'; // gray-600
+        ctx.font = '34px sans-serif';
         
         const dateObj = new Date();
         const dateStr = dateObj.toLocaleDateString('th-TH') + ' ' + dateObj.toLocaleTimeString('th-TH');
+        const refNo = Math.floor(100000000000 + Math.random() * 900000000000).toString(); // รหัสสุ่ม 12 หลัก
         
-        let startY = 450;
-        ctx.fillText('วันที่:', 60, startY);
+        let startY = 630;
+        ctx.fillText('วันที่ทำรายการ', 120, startY);
         ctx.textAlign = 'right';
-        ctx.fillText(dateStr, canvas.width - 60, startY);
+        ctx.fillText(dateStr, canvas.width - 120, startY);
 
-        startY += 60;
+        startY += 70;
         ctx.textAlign = 'left';
-        ctx.fillText('ยอดเงินที่โอน:', 60, startY);
+        ctx.fillText('รหัสอ้างอิง', 120, startY);
         ctx.textAlign = 'right';
-        ctx.fillText(amount.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 60, startY);
+        ctx.fillText(refNo, canvas.width - 120, startY);
 
-        const vat = amount * 0.07;
-        startY += 60;
-        ctx.textAlign = 'left';
-        ctx.fillText('VAT (7%):', 60, startY);
-        ctx.textAlign = 'right';
-        ctx.fillText(vat.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 60, startY);
-
-        startY += 50;
-        ctx.setLineDash([8, 8]);
+        // เส้นประ 2
+        startY += 70;
+        ctx.setLineDash([12, 12]);
         ctx.beginPath();
-        ctx.moveTo(60, startY);
-        ctx.lineTo(canvas.width - 60, startY);
+        ctx.moveTo(120, startY);
+        ctx.lineTo(canvas.width - 120, startY);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        const total = amount + vat;
-        startY += 70;
-        ctx.fillStyle = '#be185d';
-        ctx.font = 'bold 32px sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText('ยอดรวมทั้งสิ้น:', 60, startY);
-        ctx.textAlign = 'right';
-        ctx.fillText(total.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 60, startY);
+        // การคำนวณหัก VAT 7% จากยอดเงิน (ยอดสุทธิ = ยอดโอน - VAT)
+        const vat = amount * 0.07;
+        const netAmount = amount - vat;
 
-        ctx.fillStyle = '#f472b6';
-        ctx.font = 'bold 26px sans-serif';
+        startY += 90;
+        ctx.fillStyle = '#374151'; // gray-700
+        ctx.font = 'bold 36px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('ยอดเงินโอน (Transfer Amount)', 120, startY);
+        ctx.textAlign = 'right';
+        ctx.fillText(amount.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 120, startY);
+
+        startY += 70;
+        ctx.fillStyle = '#ec4899'; // pink-500
+        ctx.font = '34px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('หักภาษีมูลค่าเพิ่ม (VAT 7%)', 120, startY);
+        ctx.textAlign = 'right';
+        ctx.fillText('- ' + vat.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 120, startY);
+
+        // กล่องแสดงยอดสุทธิ
+        startY += 60;
+        ctx.fillStyle = '#fdf2f8'; // pink-50
+        roundedRect(ctx, 120, startY, 840, 140, 25);
+        
+        ctx.fillStyle = '#be185d'; // pink-700
+        ctx.font = 'bold 44px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('ยอดเงินสุทธิ (Net Amount)', 160, startY + 85);
+        ctx.textAlign = 'right';
+        ctx.fillText(netAmount.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท', canvas.width - 160, startY + 85);
+
+        // ข้อความขอบคุณด้านล่าง
+        ctx.fillStyle = '#f472b6'; // pink-400
+        ctx.font = 'bold 36px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('ขอบคุณที่ไว้วางใจใช้บริการนะคะ', canvas.width / 2, canvas.height - 80);
+        ctx.fillText('ขอบคุณที่ไว้วางใจใช้บริการนะคะ', canvas.width / 2, 1450);
 
         try {
-          const link = document.createElement('a');
-          link.download = 'SoRichard_Receipt.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+          // แปลง Canvas เป็น Data URL (รูปภาพ PNG)
+          currentSlipDataUrl = canvas.toDataURL('image/png');
+          
+          // นำรูปภาพไปใส่ใน Modal Preview
+          document.getElementById('slip-preview').src = currentSlipDataUrl;
+          
+          // ปิดหน้าแจ้งโอน และ เปิดหน้าโชว์สลิป
+          closeModal('transfer-modal');
+          openModal('slip-modal');
+
         } catch(e) {
           console.error("Canvas Export Error", e);
+          alert("เกิดข้อผิดพลาดในการสร้างสลิป กรุณาลองใหม่");
+        } finally {
+          btn.innerText = originalText;
+          btn.disabled = false;
         }
-
-        // โหลดเสร็จแล้วค่อยปิดหน้าต่าง
-        closeModal('transfer-modal');
       };
 
+      // โหลดรูปโลโก้ก่อนวาด
       const logo = new Image();
       logo.crossOrigin = "Anonymous";
       logo.src = 'https://img1.pic.in.th/images/quality_restoration_2569031620351005609152d8c8d13a154.png';
       
       logo.onload = () => { drawContent(logo); };
-      logo.onerror = () => { drawContent(null); }; // กรณีติดปัญหาดึงรูปก็จะข้ามไปวาดส่วนอื่นแทน
+      logo.onerror = () => { drawContent(null); }; // ถ้ารูปโหลดไม่ติด ก็ยังวาดสลิปต่อได้
+    }
+
+    // ฟังก์ชันดาวน์โหลดสลิปลงเครื่อง
+    function downloadSlip() {
+      if(!currentSlipDataUrl) return;
+      const link = document.createElement('a');
+      link.download = 'SoRichard_Receipt.png';
+      link.href = currentSlipDataUrl;
+      link.click();
     }
 
     function setRating(rating) {
@@ -417,7 +492,7 @@
 
       const reviewData = `คะแนน: ${currentRating} ดาว | ข้อความ: ${text}`;
       logClick('ส่งรีวิวร้าน', reviewData).then(() => {
-        alert('ส่งรีวิวเรียบร้อย ขอบคุณมากๆ ค่า! 💖');
+        alert('ส่งรีวิวเรียบร้อย ขอบคุณมากๆ ค่า!');
         closeModal('rating-modal');
         document.getElementById('review-text').value = '';
         setRating(5);
