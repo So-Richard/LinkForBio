@@ -174,7 +174,7 @@
 
   <script>
     // ===== นำ URL ของ Web App จาก Google Apps Script มาใส่ตรงนี้ =====
-    const GAS_WEB_APP_URL = 'YOUR_GOOGLE_WEB_APP_URL_HERE'; 
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwrgnIITUoqJab8dquWT7fd8q9pB6u6MHfbXPgTATlLHAsaanWfrkcDOvCQm3ggIY80/exec'; 
     // =========================================================
 
     const deviceInfo = navigator.userAgent;
@@ -288,7 +288,7 @@
 
       const reviewData = `คะแนน: ${currentRating} ดาว | ข้อความ: ${text}`;
       logClick('ส่งรีวิวร้าน', reviewData).then(() => {
-        alert('ส่งรีวิวเรียบร้อย ขอบคุณมากๆ ค่า! 💖');
+        alert('ส่งรีวิวเรียบร้อย ขอบคุณมากๆ ค่า!');
         closeModal('rating-modal');
         document.getElementById('review-text').value = '';
         setRating(5);
